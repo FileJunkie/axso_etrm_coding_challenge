@@ -43,31 +43,17 @@ public class TradeAggregator(
         // and even if a period number _is_ skipped, it's just the data that was missing
         var minPeriodNumber = aggregatedTrades.Keys.Min();
         var maxPeriodNumber = aggregatedTrades.Keys.Max();
-        var firstHourOfDay = GetFirstHourOfDay(date);
+        var firstHourOfDay = TimeUtils.GetFirstHourOfDay(date);
         var result = new List<AggregatedTrade>();
         for (var i = minPeriodNumber; i <= maxPeriodNumber; i++)
         {
             if (aggregatedTrades.TryGetValue(i, out var volume))
             {
-                var time = TimeOnly.FromDateTime(firstHourOfDay.AddHours(i).DateTime);
+                var time = TimeUtils.AddHoursRespectingTimezone(firstHourOfDay, i);
                 result.Add(new AggregatedTrade (time, volume));
             }
         }
 
         return result;
-    }
-
-    private static DateTimeOffset GetFirstHourOfDay(DateTime date)
-    {
-        // Creating the date object for the date in question, midnight and local TZ
-        var dateInWallTime = new DateTimeOffset(
-            date.Year,
-            date.Month,
-            date.Day,
-            0, 0, 0,
-            TimeUtils.LocalTimeZoneInfo.GetUtcOffset(date));
-
-        // Going to 23:00 of the previous day
-        return dateInWallTime.AddHours(-1);
     }
 }

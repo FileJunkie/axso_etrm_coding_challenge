@@ -38,6 +38,36 @@ public class TradeAggregatorTests
         result.ShouldBeEquivalentTo(GetExpected().ToList());
         await powerServiceMock.Received(1).GetTradesAsync(testDate);
     }
+
+    [Fact]
+    public async Task TradeAggregator_MustSurviveDst()
+    {
+        // Arrange
+        var testDate = new DateTime(
+            year: 2026,
+            month: 3,
+            29,
+            hour: 5,
+            minute: 0,
+            0,
+            kind: DateTimeKind.Utc);
+        var powerServiceMock = Substitute.For<IPowerService>();
+        powerServiceMock.GetTradesAsync(testDate)
+            .Returns(GetDstInputs(testDate));
+
+        var aggregator = new TradeAggregator(
+            powerServiceMock,
+            new Retrier(Substitute.For<ILogger<Retrier>>()),
+            Substitute.For<ILogger<TradeAggregator>>());
+
+        // Act
+        var result =
+            (await aggregator.AggregateTradesAsync(testDate)).ToList();
+
+        // Assert
+        result.ShouldBeEquivalentTo(GetDstExpected().ToList());
+        await powerServiceMock.Received(1).GetTradesAsync(testDate);
+    }
     
     private static IEnumerable<PowerTrade> GetInputs(DateTime date)
     {
@@ -68,6 +98,28 @@ public class TradeAggregatorTests
         for (var time = new TimeOnly(10, 0); time.Hour < 23; time = time.AddHours(1))
         {
             yield return new(time, 80);
+        }
+    }
+    
+    private static IEnumerable<PowerTrade> GetDstInputs(DateTime date)
+    {
+        var trade = PowerTrade.Create(date, 23);
+        for (var i = 0; i < 23; i++)
+        {
+            trade.Periods[i].SetVolume(i);
+        }
+
+        yield return trade;
+    }
+   
+    private static IEnumerable<AggregatedTrade> GetDstExpected()
+    {
+        yield return new(new TimeOnly(23, 0), 0);
+        yield return new(new TimeOnly(0, 0), 1);
+
+        for (var i = 2; i < 23; i++)
+        {
+            yield return new(new TimeOnly(i, 0), i);
         }
     }
 }
