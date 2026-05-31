@@ -1,6 +1,6 @@
 namespace Axpo.CodingChallenge.Utils;
 
-// Simple retrier library, because Polly is too complex
+// Simple retrier class, because Polly is too complex
 public class Retrier(ILogger<Retrier> logger)
 {
     private const int MaxRetries = 10;
