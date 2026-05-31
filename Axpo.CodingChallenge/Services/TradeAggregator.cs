@@ -1,11 +1,12 @@
 using Axpo.CodingChallenge.Models;
+using Axpo.CodingChallenge.Utils;
 
 namespace Axpo.CodingChallenge.Services;
 
-public class TradeAggregator(IPowerService powerService) : ITradeAggregator
+public class TradeAggregator(
+    IPowerService powerService,
+    ILogger<TradeAggregator> logger) : ITradeAggregator
 {
-    private static readonly TimeZoneInfo LocalTimeZoneInfo = TimeZoneInfo.FindSystemTimeZoneById("Europe/London");
-
     // It's a list of the same size on every call,
     // Where every entry is updated on every new PowerTrade object received
     // Therefore it's a Task<IEnumerable>, not IAsyncEnumerable
@@ -21,12 +22,16 @@ public class TradeAggregator(IPowerService powerService) : ITradeAggregator
         var trades = await powerService.GetTradesAsync(date);
         foreach (var trade in trades)
         {
+            logger.LogTrace("Got trade {TradeId}", trade.TradeId);
             foreach (var period in trade.Periods)
             {
+                logger.LogTrace("Got Period {Period}: volume {Volume}", period.Period, period.Volume);
                 // periods are documented to be 1-based, not 0-based
                 var aggregatedVolume = aggregatedTrades.GetValueOrDefault(period.Period - 1, 0);
+                logger.LogTrace("Aggregated volume is {Volume}", aggregatedVolume);
                 aggregatedVolume += period.Volume;
                 aggregatedTrades[period.Period - 1] = aggregatedVolume;
+                logger.LogTrace("Updated volume is {Volume}", aggregatedVolume);
             }
         }
 
@@ -59,7 +64,7 @@ public class TradeAggregator(IPowerService powerService) : ITradeAggregator
             date.Month,
             date.Day,
             0, 0, 0,
-            LocalTimeZoneInfo.GetUtcOffset(date));
+            TimeUtils.LocalTimeZoneInfo.GetUtcOffset(date));
 
         // Going to 23:00 of the previous day
         return dateInWallTime.AddHours(-1);

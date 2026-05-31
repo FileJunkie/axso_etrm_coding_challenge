@@ -1,13 +1,13 @@
-using Axpo.CodingChallenge.Services;
+using Quartz;
 
-namespace Axpo.CodingChallenge;
+namespace Axpo.CodingChallenge.Services;
 
-public class Worker(
+public class AggregationJob(
     ITradeAggregator tradeAggregator,
     IDataWriter dataWriter,
-    ILogger<Worker> logger) : BackgroundService
+    ILogger<AggregationJob> logger) : IJob
 {
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+    public async Task Execute(IJobExecutionContext context)
     {
         logger.LogInformation("Started at: {Time}", DateTimeOffset.Now);
         var data = await tradeAggregator.AggregateTradesAsync(DateTime.Now);
