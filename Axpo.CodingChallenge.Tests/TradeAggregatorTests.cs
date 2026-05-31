@@ -16,10 +16,10 @@ public class TradeAggregatorTests
         var testDate = new DateTime(
             year: 2015,
             month: 4,
-            1,
+            day: 1,
             hour: 5,
             minute: 0,
-            0,
+            second: 0,
             kind: DateTimeKind.Utc);
         var powerServiceMock = Substitute.For<IPowerService>();
         powerServiceMock.GetTradesAsync(testDate)
@@ -46,10 +46,10 @@ public class TradeAggregatorTests
         var testDate = new DateTime(
             year: 2026,
             month: 3,
-            29,
+            day: 29,
             hour: 5,
             minute: 0,
-            0,
+            second: 0,
             kind: DateTimeKind.Utc);
         var powerServiceMock = Substitute.For<IPowerService>();
         powerServiceMock.GetTradesAsync(testDate)
