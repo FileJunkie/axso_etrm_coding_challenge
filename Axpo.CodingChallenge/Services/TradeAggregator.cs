@@ -26,7 +26,7 @@ public class TradeAggregator(IPowerService powerService) : ITradeAggregator
                 // periods are documented to be 1-based, not 0-based
                 var aggregatedVolume = aggregatedTrades.GetValueOrDefault(period.Period - 1, 0);
                 aggregatedVolume += period.Volume;
-                aggregatedTrades[period.Period] = aggregatedVolume;
+                aggregatedTrades[period.Period - 1] = aggregatedVolume;
             }
         }
 

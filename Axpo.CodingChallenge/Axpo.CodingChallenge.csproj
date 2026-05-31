@@ -8,7 +8,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="33.1.0" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.1" />
+    <PackageReference Include="Quartz" Version="3.18.1" />
+    <PackageReference Include="Quartz.Extensions.DependencyInjection" Version="3.18.1" />
+    <PackageReference Include="Quartz.Extensions.Hosting" Version="3.18.1" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="PowerService">
