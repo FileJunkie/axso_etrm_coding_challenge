@@ -42,25 +42,27 @@ public class TradeAggregatorTests
     private static IEnumerable<PowerTrade> GetInputs(DateTime date)
     {
         var trade1 = PowerTrade.Create(date, 24);
-        foreach (var period in trade1.Periods)
+        for (var i = 0; i < 24; i++)
         {
-            period.SetVolume(100);
+            trade1.Periods[i].SetVolume(100.0);
         }
 
         yield return trade1;
 
         var trade2 =  PowerTrade.Create(date, 24);
-        foreach (var period in trade2.Periods)
+        for (var i = 0; i < 24; i++)
         {
-            period.SetVolume(period.Period < 12 ? 50 : -20);
+            trade2.Periods[i].SetVolume(trade2.Periods[i].Period < 12 ? 50.0 : -20.0);
         }
+
+        yield return trade2;
     }
    
     private static IEnumerable<AggregatedTrade> GetExpected()
     {
         for (var time = new TimeOnly(23, 0); time.Hour is 23 or < 10; time = time.AddHours(1))
         {
-            yield return new(time, 100);
+            yield return new(time, 150);
         }
 
         for (var time = new TimeOnly(10, 0); time.Hour < 23; time = time.AddHours(1))
