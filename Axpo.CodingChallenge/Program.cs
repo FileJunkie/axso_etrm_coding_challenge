@@ -1,30 +1,17 @@
-using Axpo;
+using Axpo.CodingChallenge;
 using Axpo.CodingChallenge.Configuration;
 using Axpo.CodingChallenge.Services;
-using Axpo.CodingChallenge.Utils;
 using Microsoft.Extensions.Options;
 using Quartz;
 
 var builder = Host.CreateApplicationBuilder(args);
 builder.Services
-    .AddSingleton<IPowerService, PowerService>()
-    .AddSingleton<ITradeAggregator, TradeAggregator>()
-    .AddSingleton<IDataWriter, DataWriter>()
-    .AddSingleton<Retrier>()
+    .AddServices()
     .AddQuartz()
     .AddQuartzHostedService();
 
-builder.Services
-    .AddOptions<SchedulerOptions>()
-    .Bind(builder.Configuration.GetSection(nameof(SchedulerOptions)))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
-
-builder.Services
-    .AddOptions<WriterOptions>()
-    .Bind(builder.Configuration.GetSection(nameof(WriterOptions)))
-    .ValidateDataAnnotations()
-    .ValidateOnStart();
+builder.Services.AddAndConfigureOptions<SchedulerOptions>(builder.Configuration);
+builder.Services.AddAndConfigureOptions<WriterOptions>(builder.Configuration);
 
 var host = builder.Build();
 
