@@ -1,5 +1,6 @@
 using Axpo.CodingChallenge.Models;
 using Axpo.CodingChallenge.Services;
+using Axpo.CodingChallenge.Utils;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Shouldly;
@@ -24,7 +25,10 @@ public class TradeAggregatorTests
         powerServiceMock.GetTradesAsync(testDate)
             .Returns(GetInputs(testDate));
 
-        var aggregator = new TradeAggregator(powerServiceMock, Substitute.For<ILogger<TradeAggregator>>());
+        var aggregator = new TradeAggregator(
+            powerServiceMock,
+            new Retrier(Substitute.For<ILogger<Retrier>>()),
+            Substitute.For<ILogger<TradeAggregator>>());
 
         // Act
         var result =

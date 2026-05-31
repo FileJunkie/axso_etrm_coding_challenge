@@ -5,6 +5,7 @@ namespace Axpo.CodingChallenge.Services;
 
 public class TradeAggregator(
     IPowerService powerService,
+    Retrier retrier,
     ILogger<TradeAggregator> logger) : ITradeAggregator
 {
     // It's a list of the same size on every call,
@@ -19,7 +20,7 @@ public class TradeAggregator(
         // which wouldn't be so in the real life
         var aggregatedTrades = new Dictionary<int, double>();
 
-        var trades = await powerService.GetTradesAsync(date);
+        var trades = await retrier.RetryUntilDone(() => powerService.GetTradesAsync(date));
         foreach (var trade in trades)
         {
             logger.LogTrace("Got trade {TradeId}", trade.TradeId);

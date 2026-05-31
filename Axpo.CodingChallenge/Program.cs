@@ -1,6 +1,7 @@
 using Axpo;
 using Axpo.CodingChallenge.Configuration;
 using Axpo.CodingChallenge.Services;
+using Axpo.CodingChallenge.Utils;
 using Microsoft.Extensions.Options;
 using Quartz;
 
@@ -9,11 +10,9 @@ builder.Services
     .AddSingleton<IPowerService, PowerService>()
     .AddSingleton<ITradeAggregator, TradeAggregator>()
     .AddSingleton<IDataWriter, DataWriter>()
+    .AddSingleton<Retrier>()
     .AddQuartz()
-    .AddQuartzHostedService(options =>
-    {
-        options.WaitForJobsToComplete = true;
-    });
+    .AddQuartzHostedService();
 
 builder.Services
     .AddOptions<SchedulerOptions>()
